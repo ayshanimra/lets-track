@@ -24,7 +24,7 @@ function MediaContacts() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/media-contacts")
+      .get("https://lets-track-fmpz.onrender.com/media-contacts")
       .then((response) => {
         setContacts(response.data)
       })
@@ -50,7 +50,7 @@ function MediaContacts() {
 
     if (editingId !== null) {
       axios
-        .put(`http://127.0.0.1:8000/media-contacts/${editingId}`, {
+        .put(`https://lets-track-fmpz.onrender.com/media-contacts/${editingId}`, {
           name,
           publication,
           email,
@@ -75,7 +75,7 @@ function MediaContacts() {
     }
 
     axios
-      .post("http://127.0.0.1:8000/media-contacts", {
+      .post("https://lets-track-fmpz.onrender.com/media-contacts", {
         name,
         publication,
         email,
@@ -103,7 +103,7 @@ function MediaContacts() {
 
   const handleDeleteContact = (contactId: number) => {
     axios
-      .delete(`http://127.0.0.1:8000/media-contacts/${contactId}`)
+      .delete(`https://lets-track-fmpz.onrender.com/media-contacts/${contactId}`)
       .then(() => {
         setContacts(
           contacts.filter((contact) => contact.id !== contactId)
@@ -181,47 +181,54 @@ function MediaContacts() {
           </button>
         )}
       </div>
-<input
-  type="text"
-  placeholder="Search media contacts..."
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-/>
+
+      <input
+        type="text"
+        placeholder="Search media contacts..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
       <div className="campaign-list">
         {contacts
-  .filter((contact) =>
-    contact.name.toLowerCase().includes(search.toLowerCase()) ||
-    contact.publication.toLowerCase().includes(search.toLowerCase())
-  )
-  .map((contact) => (
-          <div className="campaign-card" key={contact.id}>
-            <h2>{contact.name}</h2>
+          .filter(
+            (contact) =>
+              contact.name
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+              contact.publication
+                .toLowerCase()
+                .includes(search.toLowerCase())
+          )
+          .map((contact) => (
+            <div className="campaign-card" key={contact.id}>
+              <h2>{contact.name}</h2>
 
-            <p>
-              <strong>Publication:</strong> {contact.publication}
-            </p>
+              <p>
+                <strong>Publication:</strong> {contact.publication}
+              </p>
 
-            <p>
-              <strong>Email:</strong> {contact.email}
-            </p>
+              <p>
+                <strong>Email:</strong> {contact.email}
+              </p>
 
-            <p>
-              <strong>Beat:</strong> {contact.beat}
-            </p>
+              <p>
+                <strong>Beat:</strong> {contact.beat}
+              </p>
 
-            <p>
-              <strong>Status:</strong> {contact.status}
-            </p>
+              <p>
+                <strong>Status:</strong> {contact.status}
+              </p>
 
-            <button onClick={() => handleEditContact(contact)}>
-              Edit
-            </button>
+              <button onClick={() => handleEditContact(contact)}>
+                Edit
+              </button>
 
-            <button onClick={() => handleDeleteContact(contact.id)}>
-              Delete
-            </button>
-          </div>
-        ))}
+              <button onClick={() => handleDeleteContact(contact.id)}>
+                Delete
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   )

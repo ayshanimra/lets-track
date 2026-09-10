@@ -26,7 +26,7 @@ function MediaCoverage() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/media-coverage")
+      .get("https://lets-track-fmpz.onrender.com/media-coverage")
       .then((response) => {
         setCoverage(response.data)
       })
@@ -69,7 +69,7 @@ function MediaCoverage() {
     if (editingId !== null) {
       axios
         .put(
-          `http://127.0.0.1:8000/media-coverage/${editingId}`,
+          `https://lets-track-fmpz.onrender.com/media-coverage/${editingId}`,
           coverageData
         )
         .then((response) => {
@@ -91,7 +91,7 @@ function MediaCoverage() {
 
     axios
       .post(
-        "http://127.0.0.1:8000/media-coverage",
+        "https://lets-track-fmpz.onrender.com/media-coverage",
         coverageData
       )
       .then((response) => {
@@ -117,7 +117,7 @@ function MediaCoverage() {
   const handleDeleteCoverage = (coverageId: number) => {
     axios
       .delete(
-        `http://127.0.0.1:8000/media-coverage/${coverageId}`
+        `https://lets-track-fmpz.onrender.com/media-coverage/${coverageId}`
       )
       .then(() => {
         setCoverage(
@@ -208,66 +208,73 @@ function MediaCoverage() {
           </button>
         )}
       </div>
-<input
-  type="text"
-  placeholder="Search media coverage..."
-  value={search}
-  onChange={(e) => setSearch(e.target.value)}
-/>
+
+      <input
+        type="text"
+        placeholder="Search media coverage..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+
       <div className="campaign-list">
         {coverage
-  .filter((item) =>
-    item.article_title.toLowerCase().includes(search.toLowerCase()) ||
-    item.publication.toLowerCase().includes(search.toLowerCase())
-  )
-  .map((item) => (
-          <div className="campaign-card" key={item.id}>
-            <h2>{item.article_title}</h2>
+          .filter(
+            (item) =>
+              item.article_title
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+              item.publication
+                .toLowerCase()
+                .includes(search.toLowerCase())
+          )
+          .map((item) => (
+            <div className="campaign-card" key={item.id}>
+              <h2>{item.article_title}</h2>
 
-            <p>
-              <strong>Publication:</strong>{" "}
-              {item.publication}
-            </p>
+              <p>
+                <strong>Publication:</strong>{" "}
+                {item.publication}
+              </p>
 
-            <p>
-              <strong>Coverage Date:</strong>{" "}
-              {item.coverage_date}
-            </p>
+              <p>
+                <strong>Coverage Date:</strong>{" "}
+                {item.coverage_date}
+              </p>
 
-            <p>
-              <strong>Sentiment:</strong>{" "}
-              {item.sentiment}
-            </p>
+              <p>
+                <strong>Sentiment:</strong>{" "}
+                {item.sentiment}
+              </p>
 
-            <p>
-              <strong>Campaign ID:</strong>{" "}
-              {item.campaign_id}
-            </p>
+              <p>
+                <strong>Campaign ID:</strong>{" "}
+                {item.campaign_id}
+              </p>
 
-            <p>
-              <strong>Article:</strong>{" "}
-              <a
-                href={item.url}
-                target="_blank"
-                rel="noopener noreferrer"
+              <p>
+                <strong>Article:</strong>{" "}
+                <a
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  View Article
+                </a>
+              </p>
+
+              <button
+                onClick={() => handleEditCoverage(item)}
               >
-                View Article
-              </a>
-            </p>
+                Edit
+              </button>
 
-            <button
-              onClick={() => handleEditCoverage(item)}
-            >
-              Edit
-            </button>
-
-            <button
-              onClick={() => handleDeleteCoverage(item.id)}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
+              <button
+                onClick={() => handleDeleteCoverage(item.id)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   )

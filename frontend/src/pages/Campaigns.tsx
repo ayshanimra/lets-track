@@ -25,7 +25,7 @@ function Campaigns() {
 
   useEffect(() => {
     axios
-      .get("http://127.0.0.1:8000/campaigns")
+      .get("https://lets-track-fmpz.onrender.com/campaigns")
       .then((response) => {
         setCampaigns(response.data)
       })
@@ -33,20 +33,53 @@ function Campaigns() {
         console.error("Error fetching campaigns:", error)
       })
   }, [])
-const handleAddCampaign = () => {
-  if (!name || !clientName || !objective || !startDate || !endDate) {
-    alert("Please fill in all fields.")
-    return
-  }
 
-  if (endDate < startDate) {
-    alert("End date cannot be earlier than start date.")
-    return
-  }
+  const handleAddCampaign = () => {
+    if (!name || !clientName || !objective || !startDate || !endDate) {
+      alert("Please fill in all fields.")
+      return
+    }
 
-  if (editingId !== null) {
+    if (endDate < startDate) {
+      alert("End date cannot be earlier than start date.")
+      return
+    }
+
+    if (editingId !== null) {
+      axios
+        .put(`https://lets-track-fmpz.onrender.com/campaigns/${editingId}`, {
+          name,
+          client_name: clientName,
+          objective,
+          start_date: startDate,
+          end_date: endDate,
+          status
+        })
+        .then((response) => {
+          setCampaigns(
+            campaigns.map((campaign) =>
+              campaign.id === editingId ? response.data : campaign
+            )
+          )
+
+          setEditingId(null)
+          setName("")
+          setClientName("")
+          setObjective("")
+          setStartDate("")
+          setEndDate("")
+          setStatus("Draft")
+        })
+        .catch((error) => {
+          console.error("Error updating campaign:", error)
+          alert("Failed to update campaign.")
+        })
+
+      return
+    }
+
     axios
-      .put(`http://127.0.0.1:8000/campaigns/${editingId}`, {
+      .post("https://lets-track-fmpz.onrender.com/campaigns", {
         name,
         client_name: clientName,
         objective,
@@ -55,13 +88,8 @@ const handleAddCampaign = () => {
         status
       })
       .then((response) => {
-        setCampaigns(
-          campaigns.map((campaign) =>
-            campaign.id === editingId ? response.data : campaign
-          )
-        )
+        setCampaigns([...campaigns, response.data])
 
-        setEditingId(null)
         setName("")
         setClientName("")
         setObjective("")
@@ -70,59 +98,35 @@ const handleAddCampaign = () => {
         setStatus("Draft")
       })
       .catch((error) => {
-        console.error("Error updating campaign:", error)
-        alert("Failed to update campaign.")
+        console.error("Error adding campaign:", error)
+        alert("Failed to add campaign.")
       })
-
-    return
   }
 
-  axios
-    .post("http://127.0.0.1:8000/campaigns", {
-      name,
-      client_name: clientName,
-      objective,
-      start_date: startDate,
-      end_date: endDate,
-      status
-    })
-    .then((response) => {
-      setCampaigns([...campaigns, response.data])
+  const handleEditCampaign = (campaign: Campaign) => {
+    setEditingId(campaign.id)
+    setName(campaign.name)
+    setClientName(campaign.client_name)
+    setObjective(campaign.objective)
+    setStartDate(campaign.start_date)
+    setEndDate(campaign.end_date)
+    setStatus(campaign.status)
+  }
 
-      setName("")
-      setClientName("")
-      setObjective("")
-      setStartDate("")
-      setEndDate("")
-      setStatus("Draft")
-    })
-    .catch((error) => {
-      console.error("Error adding campaign:", error)
-      alert("Failed to add campaign.")
-    })
-}
-const handleEditCampaign = (campaign: Campaign) => {
-  setEditingId(campaign.id)
-  setName(campaign.name)
-  setClientName(campaign.client_name)
-  setObjective(campaign.objective)
-  setStartDate(campaign.start_date)
-  setEndDate(campaign.end_date)
-  setStatus(campaign.status)
-}
-const handleDeleteCampaign = (campaignId: number) => {
-  axios
-    .delete(`http://127.0.0.1:8000/campaigns/${campaignId}`)
-    .then(() => {
-      setCampaigns(
-        campaigns.filter((campaign) => campaign.id !== campaignId)
-      )
-    })
-    .catch((error) => {
-      console.error("Error deleting campaign:", error)
-      alert("Failed to delete campaign.")
-    })
-}
+  const handleDeleteCampaign = (campaignId: number) => {
+    axios
+      .delete(`https://lets-track-fmpz.onrender.com/campaigns/${campaignId}`)
+      .then(() => {
+        setCampaigns(
+          campaigns.filter((campaign) => campaign.id !== campaignId)
+        )
+      })
+      .catch((error) => {
+        console.error("Error deleting campaign:", error)
+        alert("Failed to delete campaign.")
+      })
+  }
+
   return (
     <div className="page">
       <h1>Campaigns</h1>
@@ -177,51 +181,61 @@ const handleDeleteCampaign = (campaignId: number) => {
         </select>
 
         <button onClick={handleAddCampaign}>
-  {editingId !== null ? "Update Campaign" : "Add Campaign"}
-</button>
+          {editingId !== null ? "Update Campaign" : "Add Campaign"}
+        </button>
       </div>
-      
 
-       <input
+      <input
         type="text"
         placeholder="Search campaigns..."
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        />
+      />
 
       <div className="campaign-list">
         {campaigns
-  .filter((campaign) =>
-    campaign.name.toLowerCase().includes(search.toLowerCase()) ||
-    campaign.client_name.toLowerCase().includes(search.toLowerCase())
-  )
-  .map((campaign) => (
-          <div className="campaign-card" key={campaign.id}>
-            <h2>{campaign.name}</h2>
+          .filter(
+            (campaign) =>
+              campaign.name
+                .toLowerCase()
+                .includes(search.toLowerCase()) ||
+              campaign.client_name
+                .toLowerCase()
+                .includes(search.toLowerCase())
+          )
+          .map((campaign) => (
+            <div className="campaign-card" key={campaign.id}>
+              <h2>{campaign.name}</h2>
 
-            <p>
-              <strong>Client:</strong> {campaign.client_name}
-            </p>
+              <p>
+                <strong>Client:</strong> {campaign.client_name}
+              </p>
 
-            <p>
-              <strong>Objective:</strong> {campaign.objective}
-            </p>
+              <p>
+                <strong>Objective:</strong> {campaign.objective}
+              </p>
 
-            <p>
-              <strong>Start Date:</strong> {campaign.start_date}
-            </p>
+              <p>
+                <strong>Start Date:</strong> {campaign.start_date}
+              </p>
 
-            <p>
-              <strong>End Date:</strong> {campaign.end_date}
-            </p>
+              <p>
+                <strong>End Date:</strong> {campaign.end_date}
+              </p>
 
-            <p>
-              <strong>Status:</strong> {campaign.status}
-            </p>
-            <button onClick={() => handleEditCampaign(campaign)}>Edit</button>
-            <button onClick={() => handleDeleteCampaign(campaign.id)}>Delete</button>
-          </div>
-        ))}
+              <p>
+                <strong>Status:</strong> {campaign.status}
+              </p>
+
+              <button onClick={() => handleEditCampaign(campaign)}>
+                Edit
+              </button>
+
+              <button onClick={() => handleDeleteCampaign(campaign.id)}>
+                Delete
+              </button>
+            </div>
+          ))}
       </div>
     </div>
   )

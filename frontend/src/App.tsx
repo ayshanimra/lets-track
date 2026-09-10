@@ -33,19 +33,21 @@ function Dashboard() {
   })
 
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
+
   const [coverage, setCoverage] = useState<{
-  id: number
-  publication: string
-  article_title: string
-  url: string
-  coverage_date: string
-  sentiment: string
-  campaign_id: number
-}[]>([])
+    id: number
+    publication: string
+    article_title: string
+    url: string
+    coverage_date: string
+    sentiment: string
+    campaign_id: number
+  }[]>([])
+
   useEffect(() => {
 
     axios
-      .get("http://127.0.0.1:8000/dashboard")
+      .get("https://lets-track-fmpz.onrender.com/dashboard")
       .then((response) => {
         setDashboard(response.data)
       })
@@ -57,7 +59,7 @@ function Dashboard() {
       })
 
     axios
-      .get("http://127.0.0.1:8000/campaigns")
+      .get("https://lets-track-fmpz.onrender.com/campaigns")
       .then((response) => {
         setCampaigns(response.data)
       })
@@ -67,8 +69,9 @@ function Dashboard() {
           error
         )
       })
+
     axios
-      .get("http://127.0.0.1:8000/media-coverage")
+      .get("https://lets-track-fmpz.onrender.com/media-coverage")
       .then((response) => {
         setCoverage(response.data)
       })
@@ -77,10 +80,11 @@ function Dashboard() {
           "Error fetching media coverage:",
           error
         )
-       })
+      })
+
   }, [])
-    
-  
+
+
   return (
     <>
 
@@ -212,7 +216,9 @@ function Dashboard() {
         )}
 
       </div>
-           <div className="recent-section">
+
+
+      <div className="recent-section">
 
         <div className="section-top">
 
@@ -275,6 +281,7 @@ function Dashboard() {
         )}
 
       </div>
+
     </>
   )
 }

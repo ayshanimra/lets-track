@@ -4,14 +4,22 @@ from sqlalchemy.orm import Session
 
 from database import Base, engine, SessionLocal
 from models import Campaign, MediaContact, MediaCoverage
-from schemas import (CampaignCreate, CampaignResponse, MediaContactCreate, MediaContactResponse, MediaCoverageCreate, MediaCoverageResponse)
+from schemas import (
+    CampaignCreate,
+    CampaignResponse,
+    MediaContactCreate,
+    MediaContactResponse,
+    MediaCoverageCreate,
+    MediaCoverageResponse
+)
 
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Let's Track API")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["https://lets-track-ten.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -48,10 +56,12 @@ def create_campaign(campaign: CampaignCreate, db: Session = Depends(get_db)):
 
     return new_campaign
 
+
 @app.get("/campaigns", response_model=list[CampaignResponse])
 def get_campaigns(db: Session = Depends(get_db)):
     campaigns = db.query(Campaign).all()
     return campaigns
+
 
 @app.get("/campaigns/{campaign_id}", response_model=CampaignResponse)
 def get_campaign(campaign_id: int, db: Session = Depends(get_db)):
@@ -61,6 +71,7 @@ def get_campaign(campaign_id: int, db: Session = Depends(get_db)):
         return {"detail": "Campaign not found"}
 
     return campaign
+
 
 @app.put("/campaigns/{campaign_id}", response_model=CampaignResponse)
 def update_campaign(
@@ -85,17 +96,23 @@ def update_campaign(
 
     return campaign
 
+
 @app.delete("/campaigns/{campaign_id}")
 def delete_campaign(campaign_id: int, db: Session = Depends(get_db)):
     campaign = db.query(Campaign).filter(Campaign.id == campaign_id).first()
 
     if not campaign:
-        raise HTTPException(status_code=404, detail="Campaign not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Campaign not found"
+        )
 
     db.delete(campaign)
     db.commit()
 
     return {"message": "Campaign deleted successfully"}
+
+
 @app.post("/media-contacts", response_model=MediaContactResponse)
 def create_media_contact(
     contact: MediaContactCreate,
@@ -114,18 +131,31 @@ def create_media_contact(
     db.refresh(new_contact)
 
     return new_contact
+
+
 @app.get("/media-contacts", response_model=list[MediaContactResponse])
 def get_media_contacts(db: Session = Depends(get_db)):
     contacts = db.query(MediaContact).all()
     return contacts
+
+
 @app.get("/media-contacts/{contact_id}", response_model=MediaContactResponse)
-def get_media_contact(contact_id: int, db: Session = Depends(get_db)):
-    contact = db.query(MediaContact).filter(MediaContact.id == contact_id).first()
+def get_media_contact(
+    contact_id: int,
+    db: Session = Depends(get_db)
+):
+    contact = db.query(MediaContact).filter(
+        MediaContact.id == contact_id
+    ).first()
 
     if not contact:
-        raise HTTPException(status_code=404, detail="Media contact not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Media contact not found"
+        )
 
     return contact
+
 
 @app.put("/media-contacts/{contact_id}", response_model=MediaContactResponse)
 def update_media_contact(
@@ -133,10 +163,15 @@ def update_media_contact(
     contact_data: MediaContactCreate,
     db: Session = Depends(get_db)
 ):
-    contact = db.query(MediaContact).filter(MediaContact.id == contact_id).first()
+    contact = db.query(MediaContact).filter(
+        MediaContact.id == contact_id
+    ).first()
 
     if not contact:
-        raise HTTPException(status_code=404, detail="Media contact not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Media contact not found"
+        )
 
     contact.name = contact_data.name
     contact.publication = contact_data.publication
@@ -149,17 +184,27 @@ def update_media_contact(
 
     return contact
 
+
 @app.delete("/media-contacts/{contact_id}")
-def delete_media_contact(contact_id: int, db: Session = Depends(get_db)):
-    contact = db.query(MediaContact).filter(MediaContact.id == contact_id).first()
+def delete_media_contact(
+    contact_id: int,
+    db: Session = Depends(get_db)
+):
+    contact = db.query(MediaContact).filter(
+        MediaContact.id == contact_id
+    ).first()
 
     if not contact:
-        raise HTTPException(status_code=404, detail="Media contact not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Media contact not found"
+        )
 
     db.delete(contact)
     db.commit()
 
     return {"message": "Media contact deleted successfully"}
+
 
 @app.post("/media-coverage", response_model=MediaCoverageResponse)
 def create_media_coverage(
@@ -181,10 +226,12 @@ def create_media_coverage(
 
     return new_coverage
 
+
 @app.get("/media-coverage", response_model=list[MediaCoverageResponse])
 def get_media_coverage(db: Session = Depends(get_db)):
     coverage = db.query(MediaCoverage).all()
     return coverage
+
 
 @app.get("/media-coverage/{coverage_id}", response_model=MediaCoverageResponse)
 def get_media_coverage_item(
@@ -202,6 +249,7 @@ def get_media_coverage_item(
         )
 
     return coverage
+
 
 @app.put("/media-coverage/{coverage_id}", response_model=MediaCoverageResponse)
 def update_media_coverage(
@@ -231,6 +279,7 @@ def update_media_coverage(
 
     return coverage
 
+
 @app.delete("/media-coverage/{coverage_id}")
 def delete_media_coverage(
     coverage_id: int,
@@ -251,11 +300,16 @@ def delete_media_coverage(
 
     return {"message": "Media coverage deleted successfully"}
 
+
 @app.get("/dashboard")
 def get_dashboard(db: Session = Depends(get_db)):
     total_campaigns = db.query(Campaign).count()
-    active_campaigns = db.query(Campaign).filter(Campaign.status == "Active").count()
-    completed_campaigns = db.query(Campaign).filter(Campaign.status == "Completed").count()
+    active_campaigns = db.query(Campaign).filter(
+        Campaign.status == "Active"
+    ).count()
+    completed_campaigns = db.query(Campaign).filter(
+        Campaign.status == "Completed"
+    ).count()
     total_contacts = db.query(MediaContact).count()
     total_coverage = db.query(MediaCoverage).count()
 
